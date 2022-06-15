@@ -9,7 +9,7 @@ import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Graphics.Canvas (strokePath, fillPath, arc, setStrokeStyle,
                         setFillStyle, getContext2D, getCanvasElementById)
-import Math as Math
+import Data.Number as Number
 import Partial.Unsafe (unsafePartial)
 
 main :: Effect Unit
@@ -33,11 +33,12 @@ main = void $ unsafePartial do
 
 -- ANCHOR: path
     let path = arc ctx
-         { x     : x * 600.0
-         , y     : y * 600.0
-         , radius: r * 50.0
-         , start : 0.0
-         , end   : Math.tau
+         { x                  : x * 600.0
+         , y                  : y * 600.0
+         , radius             : r * 50.0
+         , start              : 0.0
+         , end                : Number.tau
+         , useCounterClockwise: false
          }
 
     fillPath ctx path

@@ -26,7 +26,7 @@ A convenient way to work with asynchronous code in JavaScript is with [`async` a
 Here is an example of using this technique to copy the contents of one file to another file:
 
 ```js
-var fsPromises = require('fs').promises;
+import { promises as fsPromises } from 'fs'
 
 async function copyFile(file1, file2) {
   let data = await fsPromises.readFile(file1, { encoding: 'utf-8' });
@@ -40,6 +40,7 @@ copyFile('file1.txt', 'file2.txt')
 ```
 
 It is also possible to use callbacks or synchronous functions, but those are less desireable because:
+
 - Callbacks lead to excessive nesting, known as "Callback Hell" or the "Pyramid of Doom".
 - Synchronous functions block execution of the other code in your app.
 
@@ -93,7 +94,9 @@ You're also welcome to consult these supplemental resources too, but again, the 
 
 ## A HTTP Client
 
-The `affjax` library offers a convenient way to make asynchronous AJAX HTTP requests with `Aff`. Consult the [Affjax docs](https://pursuit.purescript.org/packages/purescript-affjax) for more usage information. Here is an example that makes HTTP GET requests at a provided URL and returns the response body or an error message:
+The `affjax` library offers a convenient way to make asynchronous AJAX HTTP requests with `Aff`. Depending on what environment you are targeting you need to use either the [purescript-affjax-web](https://github.com/purescript-contrib/purescript-affjax-web) or the [purescript-affjax-node](https://github.com/purescript-contrib/purescript-affjax-node) library.
+In the rest of this chapter we will be targeting node and thus using `purescript-affjax-node`.
+Consult the [Affjax docs](https://pursuit.purescript.org/packages/purescript-affjax) for more usage information. Here is an example that makes HTTP GET requests at a provided URL and returns the response body or an error message:
 
 ```hs
 {{#include ../exercises/chapter9/test/HTTP.purs:getUrl}}

@@ -6,6 +6,7 @@ You can edit this file as you like.
 , dependencies =
   [ "aff"
   , "affjax"
+  , "affjax-node"
   , "arrays"
   , "bifunctors"
   , "console"
@@ -21,7 +22,6 @@ You can edit this file as you like.
   , "ordered-collections"
   , "parallel"
   , "prelude"
-  , "psci-support"
   , "strings"
   , "test-unit"
   ]

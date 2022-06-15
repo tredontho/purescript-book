@@ -19,9 +19,11 @@ Functional programming techniques have been making appearances in JavaScript for
 - Asynchronous programming in NodeJS leans heavily on functions as first-class values to define callbacks.
 
     ```javascript
-    require('fs').readFile(sourceFile, function (error, data) {
+    import { readFile, writeFile } from 'fs'
+
+    readFile(sourceFile, function (error, data) {
       if (!error) {
-        require('fs').writeFile(destFile, data, function (error) {
+        writeFile(destFile, data, function (error) {
           if (!error) {
             console.log("File copied");
           }
@@ -83,7 +85,7 @@ The software requirements for this book are minimal: the first chapter will guid
 
 The PureScript compiler itself can be downloaded as a binary distribution, or built from source on any system running an up-to-date installation of the GHC Haskell compiler, and we will walk through this process in the next chapter.
 
-The code in this version of the book is compatible with versions `0.13.*` of
+The code in this version of the book is compatible with versions `0.15.*` of
 the PureScript compiler.
 
 ## About You
@@ -133,7 +135,7 @@ This book aims to provide an introduction to the PureScript language for beginne
 
 If you get stuck at any point, there are a number of resources available online for learning PureScript:
 
-- The `#purescript` and `#purescript-beginners` FP Slack channels are a great place to chat about issues you may be having. [Use this link](https://fpchat-invite.herokuapp.com/) to gain access the Slack chatrooms.
+- The [PureScript Discord server](https://discord.gg/vKn9up84bp) is a great place to chat about issues you may be having. The server is dedicated to chat about PureScript
 - The [Purescript Discourse Forum](https://discourse.purescript.org/) is another good place to search for solutions to common problems. Questions you ask here will be available to help future readers, whereas on Slack, message history is only kept for approximately 2 weeks.
 - [PureScript: Jordan's Reference](https://github.com/jordanmartinez/purescript-jordans-reference)  is an alternative learning resource that goes into great depth. If a concept in this book is difficult to understand, consider reading the corresponding section in that reference.
 - [Pursuit](https://pursuit.purescript.org) is a searchable database of PureScript types and functions. Read Pursuit's help page to [learn what kinds of searches you can do](https://pursuit.purescript.org/help/users).

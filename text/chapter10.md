@@ -57,21 +57,22 @@ We can assign this type to the function with the following foreign import declar
 {{#include ../exercises/chapter10/test/URI.purs}}
 ```
 
-We also need to write a foreign JavaScript module to import it from. A corresponding foreign JavaScript module is one of the same name but extension changed from `.purs` to `.js`. If the Purescript module above is saved as `URI.purs`, then the foreign JavaScript module is saved as `URI.js`:
+We also need to write a foreign JavaScript module to import it from. A corresponding foreign JavaScript module is one of the same name but extension changed from `.purs` to `.js`. If the Purescript module above is saved as `URI.purs`, then the foreign JavaScript module is saved as `URI.js`.
+Since `encodeURIComponent` is already defined, we have to export it as `_encodeURIComponent`:
 
 ```javascript
 {{#include ../exercises/chapter10/test/URI.js}}
 ```
 
-Purescript uses the CommonJS module system when interoperating with JavaScript. In CommonJS, functions and values are exported from a module by assigning them to _properties_ of the `exports` object.
+Since version 0.15, Purescript uses the ES module system when interoperating with JavaScript. In ES modules, functions and values are exported from a module by providing the `export` keyword on an object.
 
-With these two pieces in place, we can now use the `encodeURIComponent` function from PureScript like any function written in PureScript. For example, in PSCi, we can reproduce the calculation above:
+With these two pieces in place, we can now use the `_encodeURIComponent` function from PureScript like any function written in PureScript. For example, in PSCi, we can reproduce the calculation above:
 
 ```text
 $ spago repl
 
 > import Test.URI
-> encodeURIComponent "Hello World"
+> _encodeURIComponent "Hello World"
 "Hello%20World"
 ```
 
@@ -271,7 +272,7 @@ foreign import cumulativeSums :: Array Int -> Array Int
 ```
 
 ```js
-exports.cumulativeSums = arr => {
+export const cumulativeSums = arr => {
   let sum = 0
   let sums = []
   arr.forEach(x => {
@@ -302,7 +303,7 @@ foreign import addComplex :: Complex -> Complex -> Complex
 ```
 
 ```js
-exports.addComplex = a => b => {
+export const addComplex = a => b => {
   return {
     real: a.real + b.real,
     imag: a.imag + b.imag
@@ -331,7 +332,7 @@ We have seen examples of how to send and receive types with a native JavaScript 
 Suppose we wanted to recreate the `head` function on arrays by using a foreign declaration. In JavaScript, we might write the function as follows:
 
 ```javascript
-exports.head = arr =>
+export const head = arr =>
   arr[0];
 ```
 
@@ -347,10 +348,9 @@ But how do we return a `Maybe`? It is tempting to write the following:
 
 ```js
 // Don't do this
+import Data_Maybe from '../Data.Maybe'
 
-let Data_Maybe = require("../Data.Maybe")
-
-exports.maybeHead = arr => {
+export const maybeHead = arr => {
   if (arr.length) {
     return Data_Maybe.Just.create(arr[0]);
   } else {
@@ -364,7 +364,7 @@ Importing and using the `Data.Maybe` module directly in the foreign module isn't
 The recommended approach is to add extra parameters to our FFI-defined function to accept the functions we need.
 
 ```js
-exports.maybeHeadImpl = just => nothing => arr => {
+export const maybeHeadImpl = just => nothing => arr => {
   if (arr.length) {
     return just(arr[0]);
   } else {
@@ -420,7 +420,7 @@ The `data` keyword here indicates that we are defining a _type_, not a value. In
 We can now simply reuse our original definition for `head`:
 
 ```javascript
-exports.undefinedHead = arr =>
+export const undefinedHead = arr =>
   arr[0];
 ```
 
@@ -443,7 +443,7 @@ foreign import isUndefined :: forall a. Undefined a -> Boolean
 This is defined in our foreign JavaScript module as follows:
 
 ```javascript
-exports.isUndefined = value =>
+export const isUndefined = value =>
   value === undefined;
 ```
 
@@ -467,7 +467,7 @@ foreign import unsafeHead :: forall a. Array a -> a
 In our foreign JavaScript module, we can define `unsafeHead` as follows:
 
 ```javascript
-exports.unsafeHead = arr => {
+export const unsafeHead = arr => {
   if (arr.length) {
     return arr[0];
   } else {
@@ -508,7 +508,7 @@ Just like our earlier guide on passing the `Maybe` constructor over FFI, this is
 We start with writing a foreign JavaScript function which expects the appropriate instance of `show` to match the type of `x`.
 
 ```js
-exports.boldImpl = show => x =>
+export const boldImpl = show => x =>
   show(x).toUpperCase() + "!!!";
 ```
 
@@ -546,7 +546,7 @@ $ spago repl
 Here's another example demonstrating passing multiple functions, including a function of multiple arguments (`eq`):
 
 ```js
-exports.showEqualityImpl = eq => show => a => b => {
+export const showEqualityImpl = eq => show => a => b => {
   if (eq(a)(b)) {
     return "Equivalent";
   } else {
@@ -576,7 +576,7 @@ $ spago repl
 Let's extend our `bold` function to log to the console. Logging is an `Effect`, and `Effect`s are represented in JavaScript as a function of zero arguments, `()` with arrow notation:
 
 ```js
-exports.yellImpl = show => x => () =>
+export const yellImpl = show => x => () =>
   console.log(show(x).toUpperCase() + "!!!");
 ```
 
@@ -608,7 +608,7 @@ You'd generally only use these if you want to call existing JavaScript library A
 Instead, we'll modify our previous `diagonal` example to include logging in addition to returning the result:
 
 ```js
-exports.diagonalLog = function(w, h) {
+export const diagonalLog = function(w, h) {
   let result = Math.sqrt(w * w + h * h);
   console.log("Diagonal is " + result);
   return result;
@@ -642,7 +642,7 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 We just need to export it wrapped as an `Effect` (function of zero arguments):
 
 ```js
-exports.sleepImpl = ms => () =>
+export const sleepImpl = ms => () =>
   wait(ms);
 ```
 
@@ -685,7 +685,7 @@ async function diagonalWait(delay, w, h) {
   return Math.sqrt(w * w + h * h);
 }
 
-exports.diagonalAsyncImpl = delay => w => h => () =>
+export const diagonalAsyncImpl = delay => w => h => () =>
   diagonalWait(delay, w, h);
 ```
 
@@ -724,7 +724,7 @@ There are many reasons to use JSON in an application, for example, it's a common
 Let's revisit our earlier FFI functions `cumulativeSums` and `addComplex` and introduce a bug to each:
 
 ```js
-exports.cumulativeSumsBroken = arr => {
+export const cumulativeSumsBroken = arr => {
   let sum = 0
   let sums = []
   arr.forEach(x => {
@@ -735,7 +735,7 @@ exports.cumulativeSumsBroken = arr => {
   return sums;
 };
 
-exports.addComplexBroken = a => b => {
+export const addComplexBroken = a => b => {
   return {
     real: a.real + b.real,
     broken: a.imag + b.imag // Bug
@@ -794,8 +794,8 @@ foreign import addComplexJson :: Complex -> Complex -> Json
 Note that we're simply pointing to our existing broken functions:
 
 ```js
-exports.cumulativeSumsJson = exports.cumulativeSumsBroken
-exports.addComplexJson = exports.addComplexBroken
+export const cumulativeSumsJson = cumulativeSumsBroken
+export const addComplexJson = addComplexBroken
 ```
 
 And then write a wrapper to decode the returned foreign `Json` value:
@@ -825,8 +825,8 @@ If we call the working versions, a `Right` value is returned.
 Try this yourself by modifying `test/Examples.js` with the following change to point to the working versions before running the next repl block.
 
 ```js
-exports.cumulativeSumsJson = exports.cumulativeSums
-exports.addComplexJson = exports.addComplex
+export const cumulativeSumsJson = cumulativeSums
+export const addComplexJson = addComplex
 ```
 
 ```text
@@ -862,7 +862,7 @@ mapSetFoo = encodeJson >>> mapSetFooJson >>> decodeJson
 Here is the JavaScript implementation. Note the `Array.from` step which is necessary to convert the JavaScript `Map` into a JSON-friendly format before decoding converts it back to a PureScript `Map`.
 
 ```js
-exports.mapSetFooJson = j => {
+export const mapSetFooJson = j => {
   let m = new Map(j);
   m.set("Foo", 42);
   return Array.from(m);
@@ -941,10 +941,10 @@ foreign import getItem :: String -> Effect Json
 Here is the corresponding JavaScript implementation of these functions in `Effect/Storage.js`:
 
 ```js
-exports.setItem = key => value => () =>
+export const setItem = key => value => () =>
   window.localStorage.setItem(key, value);
 
-exports.getItem = key => () =>
+export const getItem = key => () =>
   window.localStorage.getItem(key);
 ```
 
@@ -1056,7 +1056,7 @@ foreign import alert :: String -> Effect Unit
 ```
 
 ```js
-exports.alert = msg => () =>
+export const alert = msg => () =>
   window.alert(msg);
 ```
 
@@ -1114,11 +1114,11 @@ This function finds the greatest common divisor of two numbers by repeated subtr
 To understand how this function can be called from JavaScript, it is important to realize that PureScript functions always get turned into JavaScript functions of a single argument, so we need to apply its arguments one-by-one:
 
 ```javascript
-var Test = require('Test');
+import Test from 'Test.js';
 Test.gcd(15)(20);
 ```
 
-Here, I am assuming that the code was compiled with `spago build`, which compiles PureScript modules to CommonJS modules. For that reason, I was able to reference the `gcd` function on the `Test` object, after importing the `Test` module using `require`.
+Here, I am assuming that the code was compiled with `spago build`, which compiles PureScript modules to ES modules. For that reason, I was able to reference the `gcd` function on the `Test` object, after importing the `Test` module using `import`.
 
 You might also like to bundle JavaScript code for the browser, using `spago bundle-app --to file.js`. In that case, you would access the `Test` module from the global PureScript namespace, which defaults to `PS`:
 
@@ -1308,7 +1308,9 @@ Notice that `shout` is compiled to a (curried) function of two arguments, not on
 We can call this function from JavaScript by passing an explicit type class dictionary from `Data.Show` as the first parameter:
 
 ```javascript
-shout(require('Data.Show').showNumber)(42);
+import { showNumber } from 'Data.Show'
+
+shout(showNumber)(42);
 ```
 
  ## Exercises
@@ -1322,7 +1324,7 @@ shout(require('Data.Show').showNumber)(42);
      ```
 
      What can you say about the expressions which have these types?
- 1. (Medium) Try using the functions defined in the `arrays` package, calling them from JavaScript, by compiling the library using `spago build` and importing modules using the `require` function in NodeJS. _Hint_: you may need to configure the output path so that the generated CommonJS modules are available on the NodeJS module path.
+ 1. (Medium) Try using the functions defined in the `arrays` package, calling them from JavaScript, by compiling the library using `spago build` and importing modules using the `import` function in NodeJS. _Hint_: you may need to configure the output path so that the generated ES modules are available on the NodeJS module path.
 
 ## Representing Side Effects
 
@@ -1343,7 +1345,7 @@ foreign import random :: Effect Number
 The definition of the `random` function is given here:
 
 ```javascript
-exports.random = Math.random;
+export const random = Math.random;
 ```
 
 Notice that the `random` function is represented at runtime as a function of no arguments. It performs the side effect of generating a random number, and returns it, and the return value matches the runtime representation of the `Number` type: it is a non-null JavaScript number.
@@ -1357,7 +1359,7 @@ foreign import log :: String -> Effect Unit
 And here is its definition:
 
 ```javascript
-exports.log = function (s) {
+export const log = function (s) {
   return function () {
     console.log(s);
   };
@@ -1369,7 +1371,9 @@ The representation of `log` at runtime is a JavaScript function of a single argu
 Expressions of type `Effect a` can be invoked from JavaScript like regular JavaScript methods. For example, since the `main` function is required to have type `Effect a` for some type `a`, it can be invoked as follows:
 
 ```javascript
-require('Main').main();
+import { main } from 'Main'
+
+main();
 ```
 
 When using `spago bundle-app --to` or `spago run`, this call to `main` is generated automatically, whenever the `Main` module is defined.
