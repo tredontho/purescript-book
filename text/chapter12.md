@@ -150,7 +150,7 @@ $ spago bundle-app --main Example.Shapes --to dist/Main.js
 
 and open `html/index.html` again to see the result. You should see the three different types of shapes rendered to the canvas.
 
- ## Exercises
+## Exercises
 
  1. (Easy) Experiment with the `strokePath` and `setStrokeStyle` functions in each of the examples so far.
  1. (Easy) The `fillPath` and `strokePath` functions can be used to render complex paths with a common style by using a do notation block inside the function argument. Try changing the `Rectangle` example to render two rectangles side-by-side using the same call to `fillPath`. Try rendering a sector of a circle by using a combination of a piecewise-linear path and an arc segment.
@@ -358,7 +358,7 @@ $ spago bundle-app --main Example.Refs --to dist/Main.js
 
 and open the `html/index.html` file. If you click the canvas repeatedly, you should see a green rectangle rotating around the center of the canvas.
 
- ## Exercises
+## Exercises
 
  1. (Easy) Write a higher-order function which strokes and fills a path simultaneously. Rewrite the `Random.purs` example using your function.
  1. (Medium) Use `Random` and `Dom` to create an application which renders a circle with random position, color and radius to the canvas when the mouse is clicked.
@@ -552,7 +552,7 @@ $ spago bundle-app --main Example.LSystem --to dist/Main.js
 
 and open `html/index.html`. You should see the Koch curve rendered to the canvas.
 
- ## Exercises
+## Exercises
 
  1. (Easy) Modify the L-system example above to use `fillPath` instead of `strokePath`. _Hint_: you will need to include a call to `closePath`, and move the call to `moveTo` outside of the `interpret` function.
  1. (Easy) Try changing the various numerical constants in the code, to understand their effect on the rendered system.
