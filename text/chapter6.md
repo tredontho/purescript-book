@@ -47,9 +47,47 @@ instance Show Boolean where
   show false = "false"
 ```
 
-This code declares a type class instance called `showBoolean` – in PureScript, type class instances can be named to aid the readability of the generated JavaScript. We say that the `Boolean` type _belongs to the `Show` type class_.
+This code declares a type class instance; we say that the `Boolean` type _belongs to the `Show` type class_.
 
-We can try out the `Show` type class in PSCi, by showing a few values with different types:
+> If you're wondering, the generated JS code looks like this:
+>
+> ```javascript
+> var showBoolean = {
+>     show: function (v) {
+>         if (v) {
+>             return "true";
+>         };
+>        if (!v) {
+>             return "false";
+>         };
+>         throw new Error("Failed pattern match at ...");
+>     }
+> };
+> ```
+>
+> If you're unhappy with the generated name, you can give names to type class instances. For example:
+>
+> ```haskell
+> instance myShowBoolean :: Show Boolean where
+>   show true = "true"
+>   show false = "false"
+> ```
+>
+> ```javascript
+> var myShowBoolean = {
+>     show: function (v) {
+>         if (v) {
+>             return "true";
+>         };
+>        if (!v) {
+>             return "false";
+>         };
+>         throw new Error("Failed pattern match at ...");
+>     }
+> };
+> ```
+
+We can try out the `Show` type class in PSCi by showing a few values with different types:
 
 ```text
 > import Prelude
